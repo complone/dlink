@@ -1,11 +1,28 @@
+/*
+ *
+ *  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
+
 package com.dlink.init;
 
-import com.dlink.daemon.task.DaemonFactory;
-import com.dlink.daemon.task.DaemonTaskConfig;
-import com.dlink.job.FlinkJobTask;
-import com.dlink.model.JobInstance;
-import com.dlink.service.JobInstanceService;
-import com.dlink.service.SysConfigService;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +31,13 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.dlink.daemon.task.DaemonFactory;
+import com.dlink.daemon.task.DaemonTaskConfig;
+import com.dlink.job.FlinkJobTask;
+import com.dlink.model.JobInstance;
+import com.dlink.service.JobInstanceService;
+import com.dlink.service.SysConfigService;
+import com.dlink.service.TaskService;
 
 /**
  * SystemInit
@@ -33,10 +55,13 @@ public class SystemInit implements ApplicationRunner {
     private SysConfigService sysConfigService;
     @Autowired
     private JobInstanceService jobInstanceService;
+    @Autowired
+    private TaskService taskService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         sysConfigService.initSysConfig();
+        taskService.initDefaultFlinkSQLEnv();
         List<JobInstance> jobInstances = jobInstanceService.listJobInstanceActive();
         List<DaemonTaskConfig> configList = new ArrayList<>();
         for (JobInstance jobInstance : jobInstances) {
